@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  vec-auth-server:
+    build: .
+    container_name: vec-auth-server
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - Server__PublicUrl=http://95.59.233.227:8080

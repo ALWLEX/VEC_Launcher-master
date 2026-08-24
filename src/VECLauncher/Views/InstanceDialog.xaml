@@ -1,0 +1,142 @@
+<Window x:Class="VECLauncher.Views.InstanceDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Новая сборка"
+        Height="620" Width="520"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Icon="pack://application:,,,/logo.ico"
+        FontFamily="Segoe UI">
+
+    <Border CornerRadius="12" BorderBrush="#22222E" BorderThickness="1" Background="#0C0C10">
+        <Grid Margin="22">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <StackPanel Grid.Row="0" MouseLeftButtonDown="Header_MouseLeftButtonDown">
+                <TextBlock x:Name="TxtTitle" Text="Новая сборка" FontSize="18" FontWeight="Bold"
+                           Foreground="White"/>
+                <TextBlock Text="Версия, загрузчик и название"
+                           Foreground="#666" FontSize="11" Margin="0,3,0,0"/>
+            </StackPanel>
+
+            <!-- Content -->
+            <ScrollViewer Grid.Row="1" Margin="0,16,0,0" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+
+                    <!-- Import pack -->
+                    <Border Background="#141414" CornerRadius="8" Padding="10"
+                            BorderBrush="#262626" BorderThickness="1" Margin="0,0,0,14">
+                        <Grid>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Импорт сборки" FontSize="12" FontWeight="SemiBold" Foreground="White"/>
+                                <TextBlock Text=".mrpack или .zip с Modrinth/CurseForge"
+                                           FontSize="10" Foreground="#666" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <Button Style="{StaticResource IconButton}" Content="Файл" FontSize="10" Padding="8,4"
+                                        Margin="0,0,6,0" Click="BtnImportPack_Click"/>
+                                <Button Style="{StaticResource IconButton}" Content="Ссылка" FontSize="10" Padding="8,4"
+                                        Click="BtnPackUrl_Click"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Name -->
+                    <TextBlock Text="НАЗВАНИЕ" FontSize="10" FontWeight="Bold" Foreground="#666" Margin="0,0,0,5"/>
+                    <TextBox x:Name="TxtName" Text="Новая сборка" FontSize="12"
+                             Background="#141414" Foreground="White" BorderBrush="#333"
+                             Padding="10,8" TextChanged="TxtName_TextChanged"/>
+
+                    <!-- MC Version -->
+                    <TextBlock Text="ВЕРСИЯ MINECRAFT" FontSize="10" FontWeight="Bold" Foreground="#666"
+                               Margin="0,14,0,5"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ComboBox x:Name="CbMcVersion" Grid.Column="0" Height="32"
+                                  SelectionChanged="CbMcVersion_SelectionChanged"/>
+                        <CheckBox x:Name="ChkSnapshots" Grid.Column="1" Content="Снапшоты"
+                                  Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#999"
+                                  Checked="ChkSnapshots_Changed" Unchecked="ChkSnapshots_Changed"/>
+                    </Grid>
+
+                    <!-- Loader -->
+                    <TextBlock Text="ЗАГРУЗЧИК" FontSize="10" FontWeight="Bold" Foreground="#666"
+                               Margin="0,14,0,5"/>
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton x:Name="RbVanilla" Style="{StaticResource SegmentToggle}" Content="Vanilla"
+                                     IsChecked="True" Checked="Loader_Checked" Tag="0"/>
+                        <RadioButton x:Name="RbFabric" Style="{StaticResource SegmentToggle}" Content="Fabric"
+                                     Checked="Loader_Checked" Tag="1"/>
+                        <RadioButton x:Name="RbForge" Style="{StaticResource SegmentToggle}" Content="Forge"
+                                     Checked="Loader_Checked" Tag="2"/>
+                        <RadioButton x:Name="RbNeoForge" Style="{StaticResource SegmentToggle}" Content="NeoForge"
+                                     Checked="Loader_Checked" Tag="3"/>
+                    </StackPanel>
+
+                    <!-- Loader version -->
+                    <Grid x:Name="PanelLoaderVersion" Margin="0,12,0,0" Visibility="Collapsed">
+                        <StackPanel>
+                            <TextBlock Text="ВЕРСИЯ ЗАГРУЗЧИКА" FontSize="10" FontWeight="Bold" Foreground="#666" Margin="0,0,0,5"/>
+                            <ComboBox x:Name="CbLoaderVersion" Height="32"/>
+                            <TextBlock x:Name="TxtLoaderHint" Text="" Foreground="#666"
+                                       FontSize="10" Margin="0,6,0,0" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Isolated -->
+                    <CheckBox x:Name="ChkIsolated" Margin="0,14,0,0" Foreground="#999"
+                              Content="Изолированная сборка (свое хранилище)"/>
+                    <TextBlock Text="Библиотеки и ассеты внутри папки сборки. Больше места, но сборку можно копировать."
+                               Foreground="#555" FontSize="10" Margin="24,4,0,0" TextWrapping="Wrap"/>
+
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Footer -->
+            <Grid Grid.Row="2" Margin="0,14,0,0">
+                <TextBlock x:Name="TxtStatus" Text="" Foreground="#666"
+                           FontSize="11" VerticalAlignment="Center" HorizontalAlignment="Left"
+                           TextWrapping="Wrap" MaxWidth="240"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button x:Name="BtnCancel" Height="34" MinWidth="80"
+                            Cursor="Hand" Background="Transparent" BorderThickness="0"
+                            Click="BtnCancel_Click">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="Bd" Background="#1A1A1A" CornerRadius="8">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Bd" Property="Background" Value="#252525"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                        <TextBlock Text="Отмена" FontSize="12" Foreground="#999"/>
+                    </Button>
+                    <Button x:Name="BtnCreate" Style="{StaticResource AccentButton}" Content="Создать"
+                            Height="34" MinWidth="100" Margin="8,0,0,0" FontSize="12"
+                            Click="BtnCreate_Click"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Hidden: color items for code-behind -->
+            <Grid Visibility="Collapsed" Margin="0">
+                <ItemsControl x:Name="ItemsColors"/>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

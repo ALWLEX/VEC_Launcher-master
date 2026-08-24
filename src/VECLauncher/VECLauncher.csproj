@@ -1,0 +1,89 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>VECLauncher</AssemblyName>
+    <RootNamespace>VECLauncher</RootNamespace>
+    <Version>1.0.0</Version>
+    <Product>VEC Launcher</Product>
+    <Company>VEC</Company>
+    <AssemblyTitle>VEC Launcher</AssemblyTitle>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <ApplicationIcon>logo.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <PublishTrimmed>false</PublishTrimmed>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="VECLauncher.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
+    <PackageReference Include="CmlLib.Core.Auth.Microsoft" Version="*" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="logo.ico" />
+    <Resource Include="Assets\home_bg.jpg" />
+    <Resource Include="Assets\default_instance_icon.jpg" />
+    <Resource Include="Assets\version_menu_bg.jpg" />
+    <Resource Include="Assets\mods_menu_bg.jpg" />
+    <Resource Include="Assets\rp_shader_bg.png" />
+    <Resource Include="Assets\account_bg.jpg" />
+    <Resource Include="Assets\default_content_icon.jpg" />
+    <Resource Include="Assets\steve_classic.png" />
+    <Resource Include="Assets\alex_slim.png" />
+    <Resource Include="Assets\cape_migrator.png" />
+    <Resource Include="Assets\cape_vec.png" />
+    <Resource Include="Assets\slime.png" />
+    <Resource Include="Assets\main_page.png" />
+    <Resource Include="Assets\version_page.png" />
+    <Resource Include="Assets\mods_page.png" />
+    <Resource Include="Assets\content_page.png" />
+    <Resource Include="Assets\profile_page.png" />
+    <Resource Include="Assets\setting_page.png" />
+    <Resource Include="Assets\icon_skin_exploler.png" />
+    <Resource Include="Assets\icon_cape_button.png" />
+    <Resource Include="Assets\3D_Model.gltf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\steve_classic.png" />
+    <EmbeddedResource Include="Assets\alex_slim.png" />
+    <EmbeddedResource Include="Assets\cape_migrator.png" />
+    <EmbeddedResource Include="Assets\cape_vec.png" />
+    <EmbeddedResource Include="Assets\3D_Model.gltf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="System.IO" />
+    <Using Include="System.Net.Http" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Threading" />
+    <Using Include="System.Threading.Tasks" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,1920 @@
+<Window x:Class="VECLauncher.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="VEC Launcher"
+        Icon="pack://application:,,,/logo.ico"
+        Height="700" Width="1140"
+        MinHeight="500" MinWidth="800"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        FontFamily="Segoe UI"
+        UseLayoutRounding="True"
+        Foreground="{DynamicResource Fg}"
+        TextOptions.TextFormattingMode="Display">
+
+    <Border x:Name="WindowBorder" Background="{DynamicResource BgDeep}" CornerRadius="14"
+            BorderBrush="{DynamicResource BorderBrushDark}" BorderThickness="1"
+            SizeChanged="WindowBorder_SizeChanged">
+        <Grid>
+            <Rectangle x:Name="WindowBgLayer" Fill="Transparent" IsHitTestVisible="False"/>
+
+            <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="52"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Background="#0A0A0C" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
+                    <Border Width="28" Height="28" CornerRadius="8" ClipToBounds="True">
+                        <Image Source="pack://application:,,,/logo.ico" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality"/>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center" Margin="10,0,0,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="VEC" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource Accent}"/>
+                            <TextBlock Text=" PLATFORM" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource Fg}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                        <Border x:Name="RunningBadge" Visibility="Collapsed" IsHitTestVisible="False">
+                            <TextBlock x:Name="TxtRunningBadge" Visibility="Collapsed"/>
+                        </Border>
+                    </StackPanel>
+
+                <Grid Grid.Column="1" Background="Transparent"/>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0">
+                    <Button Style="{StaticResource IconButton}" Content="🌐 vec.kpvk.edu.kz" Command="{Binding OpenWebsiteCommand}" Margin="0,0,8,0" ToolTip="Открыть официальный сайт VEC" Height="28" Padding="10,0"/>
+                    <Button x:Name="BtnMinimize" Style="{StaticResource TitleBarButton}" Click="BtnMinimize_Click" ToolTip="Свернуть">
+                        <Path Data="M 0,6 L 10,6" Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" StrokeThickness="1.5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                    <Button x:Name="BtnMaximize" Style="{StaticResource TitleBarButton}" Click="BtnMaximize_Click" ToolTip="Развернуть">
+                        <Path x:Name="MaximizeIcon" Data="M 0,0 L 10,0 L 10,10 L 0,10 Z" Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" StrokeThickness="1.5" Fill="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                    <Button x:Name="BtnClose" Style="{StaticResource CloseButton}" Click="BtnClose_Click" ToolTip="Закрыть">
+                        <Path Data="M 0,0 L 9,9 M 9,0 L 0,9" Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" StrokeThickness="1.5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="215"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0">
+
+                    <Grid x:Name="PageHome" Grid.Row="0">
+
+                        <!-- Full-Bleed Background Image -->
+                        <Border>
+                            <Border.Background>
+                                <ImageBrush ImageSource="pack://application:,,,/Assets/home_bg.jpg" Stretch="UniformToFill"/>
+                            </Border.Background>
+                        </Border>
+
+                        <!-- Bottom gradient curtain (dark fade so elements pop) -->
+                        <Border VerticalAlignment="Bottom" Height="340" IsHitTestVisible="False">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                    <GradientStop Color="#00000000" Offset="0"/>
+                                    <GradientStop Color="#40000000" Offset="0.35"/>
+                                    <GradientStop Color="#B0000000" Offset="0.7"/>
+                                    <GradientStop Color="#E0000000" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+
+                        <!-- Bottom progress bar (for downloads) -->
+                        <Border x:Name="ProgressArea" VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                                Margin="0,0,0,24" Visibility="{Binding ProgressVisible, Converter={StaticResource BoolToVis}}" Width="320"
+                                Background="#35161A28" BorderBrush="#38FFFFFF" BorderThickness="1"
+                                CornerRadius="12" Padding="14,8">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="20" ShadowDepth="0" Opacity="0.18" Color="White"/>
+                            </Border.Effect>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0" Margin="0,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock x:Name="TxtProgressStage" Text="{Binding ProgressStage}" FontSize="11" FontWeight="SemiBold"
+                                               Foreground="#E0E0EC" VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis" Margin="0,0,10,0"/>
+                                    <TextBlock x:Name="TxtProgressPercent" Grid.Column="1" Text="{Binding ProgressPercent}" FontSize="11.5" FontWeight="Black"
+                                               Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                                </Grid>
+                                <ProgressBar x:Name="PbProgress" Grid.Row="1" Height="5" Minimum="0" Maximum="100" Value="0"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Hidden legacy elements (kept for code-behind compatibility) -->
+                        <Grid Visibility="Collapsed" IsHitTestVisible="False">
+                            <ComboBox x:Name="CbInstances" Width="290"
+                                      SelectionChanged="CbInstances_SelectionChanged"/>
+                            <Button x:Name="BtnCancel" Content="Отмена" Command="{Binding CancelCommand}"/>
+                            <Button x:Name="BtnStopGame" Content="ОСТАНОВИТЬ" Click="BtnStopGame_Click"/>
+                            <Button x:Name="BtnPlay" Content="ИГРАТЬ" Click="BtnPlay_Click"/>
+                        </Grid>
+
+                        <!-- Left-side instance selector (Glassmorphism half-pill, flat left, round right) -->
+                        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                    Margin="40,0,0,70" Width="265">
+                            <!-- Decorative tag header -->
+                            <StackPanel Orientation="Horizontal" Margin="4,0,0,8" VerticalAlignment="Center">
+                                <Border Width="6" Height="6" CornerRadius="3" Background="#FFFFFF" Opacity="0.85" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBlock Text="ВЕРСИЯ / СБОРКА" FontSize="9" FontWeight="Bold" Foreground="#888899"/>
+                            </StackPanel>
+
+                            <!-- Version Selector Half-Pill (Height 46px, glassmorphic, opens upwards) -->
+                            <ComboBox x:Name="CbInstancesHome"
+                                      Style="{StaticResource HomeVersionComboStyle}"
+                                      SelectionChanged="CbInstancesHome_SelectionChanged"
+                                      ToolTip="Какая сборка запустится по кнопке «ИГРАТЬ»">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,3">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <!-- Round Mini Icon (no outer border) -->
+                                            <Border Grid.Column="0" Width="30" Height="30" CornerRadius="15"
+                                                    Background="Transparent" BorderThickness="0"
+                                                    VerticalAlignment="Center" Margin="0,0,10,0" ClipToBounds="True">
+                                                <Image Source="{Binding DisplayIcon}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                            </Border>
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF"/>
+                                                <TextBlock FontSize="10" Foreground="#D0D0E0" Margin="0,1,0,0">
+                                                    <Run Text="{Binding LoaderDisplay, Mode=OneWay}"/>
+                                                    <Run Text=" · "/>
+                                                    <Run Text="{Binding McVersion, Mode=OneWay}"/>
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- Right-side content frame -->
+                        <Grid HorizontalAlignment="Right" Width="340" Margin="0,0,60,0">
+                            <!-- Thick vertical accent line -->
+                            <Border Width="4" Background="White" HorizontalAlignment="Right"
+                                    VerticalAlignment="Stretch" Margin="0,80,0,80" CornerRadius="2" Opacity="0.85"/>
+
+                            <!-- Content area -->
+                            <StackPanel VerticalAlignment="Bottom" Margin="0,0,30,50" HorizontalAlignment="Right">
+
+                                <!-- Player count + PLAY button row -->
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+
+                                    <!-- Server online badge (left of play button) -->
+                                    <Border x:Name="ServerInfoBadge" VerticalAlignment="Center" Margin="0,0,14,0"
+                                            Background="#28FFFFFF" CornerRadius="10" Padding="12,6">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Ellipse Width="7" Height="7" Fill="#22C55E" VerticalAlignment="Center"/>
+                                            <TextBlock Text=" " FontSize="5"/>
+                                            <TextBlock x:Name="TxtServerPlayers" Text="— / —" FontSize="12.5" FontWeight="Bold"
+                                                       Foreground="White" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- PLAY button (50% smaller than before) -->
+                                    <Button x:Name="BtnConnectVEC" Height="46" MinWidth="158"
+                                            Click="BtnConnectVEC_Click" Cursor="Hand"
+                                            Background="Transparent" BorderThickness="0"
+                                            MouseEnter="BtnConnectVEC_MouseEnter"
+                                            MouseLeave="BtnConnectVEC_MouseLeave">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="BtnHomeBd" Background="White" CornerRadius="23">
+                                                    <Border.Effect>
+                                                        <DropShadowEffect x:Name="BtnHomeShadow" Color="White" BlurRadius="22"
+                                                                         ShadowDepth="0" Opacity="0.18"/>
+                                                    </Border.Effect>
+                                                    <TextBlock x:Name="BtnHomeText" Text="ИГРАТЬ" FontSize="17" FontWeight="Black"
+                                                               Foreground="Black" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="BtnHomeBd" Property="Background" Value="#F0F0F0"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsPressed" Value="True">
+                                                        <Setter TargetName="BtnHomeBd" Property="Background" Value="#D8D8D8"/>
+                                                        <Setter TargetName="BtnHomeBd" Property="RenderTransform">
+                                                            <Setter.Value>
+                                                                <ScaleTransform ScaleX="0.96" ScaleY="0.96"
+                                                                                CenterX="79" CenterY="23"/>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                </StackPanel>
+
+                                <!-- Horizontal divider line (dialog style, wider) -->
+                                <Border Height="1" Background="White" Opacity="0.22"
+                                        Margin="14,16,14,0" CornerRadius="0.5"/>
+
+                                <!-- Naigrano (50% smaller) -->
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
+                                            Margin="0,12,0,0">
+                                    <TextBlock Text="НАИГРАНО:  " FontSize="8.5" FontWeight="Bold"
+                                               Foreground="White" Opacity="0.5"/>
+                                    <TextBlock x:Name="StatTotalTime" Text="0 ч" FontSize="8.5"
+                                               FontWeight="Black" Foreground="White" Opacity="0.85"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+
+                    <Grid x:Name="PageInstances" Grid.Row="0" Margin="0" Visibility="Collapsed">
+                        <Grid.Background>
+                            <ImageBrush ImageSource="pack://application:,,,/Assets/version_menu_bg.jpg" Stretch="UniformToFill" Opacity="0.15"/>
+                        </Grid.Background>
+                        <Grid Margin="20,14,20,0">
+                            <Grid x:Name="PanelInstancesGallery" Visibility="Visible">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Header -->
+                                <Grid Grid.Row="0" Margin="0,0,0,16">
+                                    <StackPanel>
+                                        <TextBlock Text="Сборки / Версия" Style="{StaticResource H1}"/>
+                                        <TextBlock Text="Управление вашими сборками и версиями игры" Foreground="#777788" FontSize="11.5" Margin="0,4,0,0"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                        <Button Style="{StaticResource IconButton}" Content="Папка сборок" FontSize="11" Padding="12,5"
+                                                Margin="0,0,8,0" Click="BtnOpenAllInstancesFolder_Click"/>
+                                        <Button x:Name="BtnNewInstance" Style="{StaticResource AccentButton}" Content="+  Новая сборка"
+                                                Height="34" MinWidth="135" Padding="16,0" FontSize="12"
+                                                Click="BtnNewInstance_Click"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Content: Empty State or Grid of Cards -->
+                                <Grid Grid.Row="1">
+                                    <!-- Empty State -->
+                                    <Border x:Name="PanelInstancesEmpty" Visibility="Collapsed"
+                                            Background="#111116" BorderBrush="#1F1F28" BorderThickness="1"
+                                            CornerRadius="14" Padding="40,60" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <Border Width="56" Height="56" CornerRadius="12" Background="#161622" BorderBrush="#252536" BorderThickness="1"
+                                                    HorizontalAlignment="Center" Margin="0,0,0,16">
+                                                <Path Data="M 12 18 L 28 8 L 44 18 L 28 28 Z M 12 21 L 28 31 L 28 46 L 12 36 Z M 44 21 L 28 31 L 28 46 L 44 36 Z"
+                                                      Stroke="#666677" StrokeThickness="1.5" Fill="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Text="У вас пока нет установленных сборок" FontSize="15" FontWeight="Bold"
+                                                       Foreground="#FFFFFF" Margin="0,4,0,0" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Создайте новую сборку или выберите версию Minecraft" FontSize="12"
+                                                       Foreground="#777788" Margin="0,4,0,20" HorizontalAlignment="Center"/>
+                                            <Button Style="{StaticResource AccentButton}" Content="+  Создать первую сборку"
+                                                    Padding="20,9" FontSize="12.5" HorizontalAlignment="Center"
+                                                    Click="BtnNewInstance_Click"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Grid Cards ScrollViewer -->
+                                    <ScrollViewer x:Name="ScrollInstancesCards" VerticalScrollBarVisibility="Auto">
+                                        <ListBox x:Name="LstInstances" Background="Transparent" BorderThickness="0"
+                                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                                 SelectionChanged="LstInstances_SelectionChanged">
+                                            <ListBox.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <WrapPanel Orientation="Horizontal"/>
+                                                </ItemsPanelTemplate>
+                                            </ListBox.ItemsPanel>
+                                            <ListBox.ItemContainerStyle>
+                                                <Style TargetType="ListBoxItem">
+                                                    <Setter Property="Padding" Value="0"/>
+                                                    <Setter Property="Margin" Value="0,0,16,16"/>
+                                                    <Setter Property="Background" Value="Transparent"/>
+                                                    <Setter Property="BorderThickness" Value="0"/>
+                                                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="ListBoxItem">
+                                                                <ContentPresenter/>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+                                            </ListBox.ItemContainerStyle>
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border x:Name="CardBd" Width="220" Height="265" Background="#111116"
+                                                            BorderBrush="#1F1F28" BorderThickness="1" CornerRadius="12"
+                                                            Cursor="Hand" MouseLeftButtonUp="InstanceCard_Click">
+                                                        <Border.ContextMenu>
+                                                            <ContextMenu Template="{DynamicResource DarkContextMenuTemplate}">
+                                                                <MenuItem Header="Играть" Click="CardPlay_Click" FontWeight="Bold" FontSize="12.5" Padding="14,8"/>
+                                                                <Separator Background="#22222E" Margin="4,2"/>
+                                                                <MenuItem Header="Настройки сборки" Click="CardSettings_Click" FontSize="12" Padding="14,8"/>
+                                                                <MenuItem Header="Контент сборки" Click="CardContent_Click" FontSize="12" Padding="14,8"/>
+                                                                <Separator Background="#22222E" Margin="4,2"/>
+                                                                <MenuItem Header="Папка модов" Click="CardOpenMods_Click" FontSize="12" Padding="14,8"/>
+                                                                <MenuItem Header="Корень сборки" Click="CardOpenRoot_Click" FontSize="12" Padding="14,8"/>
+                                                                <Separator Background="#22222E" Margin="4,2"/>
+                                                                <MenuItem Header="Дублировать" Click="CardDuplicate_Click" FontSize="12" Padding="14,8"/>
+                                                                <MenuItem Header="Удалить сборку" Click="CardDelete_Click" FontSize="12" Padding="14,8" Foreground="#EF4444"/>
+                                                            </ContextMenu>
+                                                        </Border.ContextMenu>
+                                                        <Grid>
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="150"/>
+                                                                <RowDefinition Height="*"/>
+                                                            </Grid.RowDefinitions>
+
+                                                            <!-- Top Banner / Cover Area -->
+                                                            <Border Grid.Row="0" CornerRadius="11,11,0,0" ClipToBounds="True" Background="#14141C">
+                                                                <Grid>
+                                                                    <Image Source="{Binding DisplayIcon}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality"/>
+
+                                                                    <!-- Top Right Version Badge -->
+                                                                    <Border HorizontalAlignment="Right" VerticalAlignment="Top" Margin="8"
+                                                                            Background="#D908080C" BorderBrush="#33FFFFFF" BorderThickness="1"
+                                                                            CornerRadius="5" Padding="7,3">
+                                                                        <TextBlock FontSize="10" FontWeight="Bold" Foreground="#FFFFFF">
+                                                                            <Run Text="{Binding LoaderDisplay, Mode=OneWay}"/>
+                                                                            <Run Text=" · "/>
+                                                                            <Run Text="{Binding McVersion, Mode=OneWay}"/>
+                                                                        </TextBlock>
+                                                                    </Border>
+
+                                                                    <!-- Hover Overlay with Actions -->
+                                                                    <Border x:Name="HoverOverlay" Background="#E60A0A0E" Opacity="0">
+                                                                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                                            <Button Style="{StaticResource AccentButton}" Content="Играть"
+                                                                                    Padding="20,7" FontSize="12"
+                                                                                    Click="CardPlay_Click" Tag="{Binding}"/>
+                                                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
+                                                                                <Button Style="{StaticResource IconButton}" Content="Настройки"
+                                                                                        FontSize="11" Padding="10,5"
+                                                                                        Click="CardSettings_Click" Tag="{Binding}"/>
+                                                                                <Button Style="{StaticResource IconButton}" Content="Папка"
+                                                                                        FontSize="11" Padding="10,5" Margin="6,0,0,0"
+                                                                                        ToolTip="Папка модов"
+                                                                                        Click="CardOpenMods_Click" Tag="{Binding}"/>
+                                                                            </StackPanel>
+                                                                        </StackPanel>
+                                                                    </Border>
+                                                                </Grid>
+                                                            </Border>
+
+                                                            <!-- Bottom Details Area -->
+                                                            <Border Grid.Row="1" Padding="12,10,12,12">
+                                                                <StackPanel VerticalAlignment="Center">
+                                                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="13.5"
+                                                                               Foreground="#FFFFFF" TextTrimming="CharacterEllipsis"/>
+                                                                    <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                                                                        <TextBlock FontSize="11" Foreground="#777788">
+                                                                            <Run Text="Minecraft "/>
+                                                                            <Run Text="{Binding McVersion, Mode=OneWay}"/>
+                                                                        </TextBlock>
+                                                                    </StackPanel>
+                                                                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                                                        <TextBlock FontSize="10" Foreground="#555566" Text="{Binding PlayTimeDisplay}"/>
+                                                                    </StackPanel>
+                                                                </StackPanel>
+                                                            </Border>
+                                                        </Grid>
+                                                    </Border>
+                                                    <DataTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="CardBd" Property="BorderBrush" Value="#38384E"/>
+                                                            <Setter TargetName="CardBd" Property="Background" Value="#14141C"/>
+                                                            <Setter TargetName="HoverOverlay" Property="Opacity" Value="1"/>
+                                                        </Trigger>
+                                                    </DataTemplate.Triggers>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Grid>
+
+                            <Grid x:Name="PanelInstanceConfig" Visibility="Collapsed">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Config Header -->
+                                <Grid Grid.Row="0" Margin="0,0,0,16">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Button Style="{StaticResource IconButton}" Content="←  К сборкам"
+                                                FontSize="11.5" Padding="12,5" Margin="0,0,14,0"
+                                                Click="BtnBackToGallery_Click"/>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock x:Name="TxtInstName" Text="{Binding InstName}" FontSize="18" FontWeight="Bold" Foreground="#FFFFFF"/>
+                                            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                                <TextBlock x:Name="TxtInstVersion" Text="{Binding InstVersion}" FontSize="11" Foreground="#777788"/>
+                                                <TextBlock Text=" · " FontSize="11" Foreground="#555566"/>
+                                                <TextBlock x:Name="TxtInstLoader" Text="{Binding InstLoader}" FontSize="11" Foreground="#777788"/>
+                                                <TextBlock Text=" · " FontSize="11" Foreground="#555566"/>
+                                                <TextBlock x:Name="TxtInstPlaytime" Text="{Binding InstPlaytime}" FontSize="11" Foreground="#555566"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                        <Button Style="{StaticResource AccentButton}" Content="Играть" FontSize="11.5"
+                                                Padding="18,6" Margin="0,0,8,0" Click="InstConfigPlay_Click"/>
+                                        <Button Style="{StaticResource IconButton}" Content="Папка модов" FontSize="11"
+                                                Padding="10,5" Margin="0,0,6,0" Click="OpenMods_Click"/>
+                                        <Button Style="{StaticResource IconButton}" Content="Корень" FontSize="11"
+                                                Padding="10,5" Margin="0,0,6,0" Click="OpenInstanceRoot_Click"/>
+                                        <Button Style="{StaticResource DangerButton}" Content="Удалить" FontSize="11"
+                                                Padding="10,5" Click="BtnDeleteInstance_Click"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Config Content -->
+                                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                    <StackPanel x:Name="PanelInstanceDetails" Margin="0,0,6,16">
+
+                                        <!-- Card: Folders Quick Access -->
+                                        <Border CornerRadius="10" Padding="14" Margin="0,0,0,12" Background="#111116"
+                                                BorderBrush="#1F1F28" BorderThickness="1">
+                                            <StackPanel>
+                                                <TextBlock Text="КОНТЕНТ СБОРКИ" Style="{StaticResource Caption}"/>
+                                                <Grid Margin="0,4,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="8"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="8"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Button Grid.Column="0" Style="{StaticResource IconButton}" Padding="12,10"
+                                                            Click="OpenMods_Click">
+                                                        <StackPanel>
+                                                            <TextBlock x:Name="TxtFolderMods" Text="Моды" FontWeight="SemiBold" FontSize="12"/>
+                                                            <TextBlock x:Name="TxtCountMods" Text="{Binding InstCountMods}" FontSize="10" Foreground="#777788" Margin="0,2,0,0"/>
+                                                        </StackPanel>
+                                                    </Button>
+                                                    <Button Grid.Column="2" Style="{StaticResource IconButton}" Padding="12,10"
+                                                            Click="OpenResourcePacks_Click">
+                                                        <StackPanel>
+                                                            <TextBlock Text="Ресурспаки" FontWeight="SemiBold" FontSize="12"/>
+                                                            <TextBlock x:Name="TxtCountRp" Text="{Binding InstCountRp}" FontSize="10" Foreground="#777788" Margin="0,2,0,0"/>
+                                                        </StackPanel>
+                                                    </Button>
+                                                    <Button Grid.Column="4" Style="{StaticResource IconButton}" Padding="12,10"
+                                                            Click="OpenShaders_Click">
+                                                        <StackPanel>
+                                                            <TextBlock Text="Шейдеры" FontWeight="SemiBold" FontSize="12"/>
+                                                            <TextBlock x:Name="TxtCountShaders" Text="{Binding InstCountShaders}" FontSize="10" Foreground="#777788" Margin="0,2,0,0"/>
+                                                        </StackPanel>
+                                                    </Button>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Card: Main Settings -->
+                                        <Border CornerRadius="10" Padding="16" Margin="0,0,0,12" Background="#111116"
+                                                BorderBrush="#1F1F28" BorderThickness="1">
+                                            <StackPanel>
+                                                <TextBlock Text="ПАРАМЕТРЫ СБОРКИ" Style="{StaticResource Caption}"/>
+
+                                                <!-- Name -->
+                                                <Grid Margin="0,4,0,12">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="185"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="Название сборки" VerticalAlignment="Center" FontSize="11.5" Foreground="#AAAAAA"/>
+                                                    <TextBox x:Name="TxtInstEditName" Grid.Column="1" Height="36" FontSize="12"
+                                                             LostFocus="InstSetting_Changed" TextChanged="InstSettingText_Changed"/>
+                                                </Grid>
+
+                                                <!-- Icon -->
+                                                <Grid Margin="0,0,0,14">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="185"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="Иконка сборки" VerticalAlignment="Center" FontSize="11.5" Foreground="#AAAAAA"/>
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <Border Height="40" Width="40" CornerRadius="8" Background="#16161E" ClipToBounds="True">
+                                                            <Grid>
+                                                                <Image x:Name="ImgInstIcon" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                                                <Border x:Name="InstIconDot" Width="10" Height="10" CornerRadius="3"/>
+                                                            </Grid>
+                                                        </Border>
+                                                        <Button Style="{StaticResource IconButton}" Content="Выбрать файл..." FontSize="11" Padding="12,5"
+                                                                Margin="10,0,0,0" Click="BtnInstIcon_Click"/>
+                                                        <Button Style="{StaticResource IconButton}" Content="Сбросить" FontSize="11" Padding="10,5"
+                                                                Margin="6,0,0,0" Click="BtnInstIconClear_Click"/>
+                                                    </StackPanel>
+                                                </Grid>
+
+                                                <!-- RAM slider + presets -->
+                                                <Grid Margin="0,0,0,6">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="185"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="Оперативная память" VerticalAlignment="Center" FontSize="11.5" Foreground="#AAAAAA"/>
+                                                    <Slider x:Name="SldInstMemory" Grid.Column="1" Minimum="1024" Maximum="16384"
+                                                            TickFrequency="512" IsSnapToTickEnabled="True" Value="4096"
+                                                            ValueChanged="SldInstMemory_ValueChanged" VerticalAlignment="Center"/>
+                                                    <TextBlock x:Name="TxtInstMemory" Grid.Column="2" Text="4096 МБ" Width="70"
+                                                               TextAlignment="Right" VerticalAlignment="Center" FontSize="11.5" FontWeight="Bold"
+                                                               Foreground="#FFFFFF"/>
+                                                </Grid>
+                                                <StackPanel Orientation="Horizontal" Margin="185,0,0,14">
+                                                    <Button Style="{StaticResource IconButton}" Content="2 ГБ" FontSize="10.5" Padding="10,4"
+                                                            Margin="0,0,4,0" Command="{Binding SetInstanceMemoryCommand}" CommandParameter="2048"/>
+                                                    <Button Style="{StaticResource IconButton}" Content="4 ГБ" FontSize="10.5" Padding="10,4"
+                                                            Margin="0,0,4,0" Command="{Binding SetInstanceMemoryCommand}" CommandParameter="4096"/>
+                                                    <Button Style="{StaticResource IconButton}" Content="8 ГБ" FontSize="10.5" Padding="10,4"
+                                                            Margin="0,0,4,0" Command="{Binding SetInstanceMemoryCommand}" CommandParameter="8192"/>
+                                                    <Button Style="{StaticResource IconButton}" Content="Авто" FontSize="10.5" Padding="10,4"
+                                                            Command="{Binding SetInstanceMemoryCommand}" CommandParameter="0"/>
+                                                </StackPanel>
+
+                                                <!-- Window resolution -->
+                                                <Grid Margin="0,0,0,12">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="185"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="Разрешение окна" VerticalAlignment="Center" FontSize="11.5" Foreground="#AAAAAA"/>
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <Button Style="{StaticResource IconButton}" Content="1280×720 (HD)" FontSize="10.5" Padding="10,4"
+                                                                Margin="0,0,6,0" Command="{Binding SetInstanceWindowCommand}" CommandParameter="1280x720"/>
+                                                        <Button Style="{StaticResource IconButton}" Content="1600×900" FontSize="10.5" Padding="10,4"
+                                                                Margin="0,0,6,0" Command="{Binding SetInstanceWindowCommand}" CommandParameter="1600x900"/>
+                                                        <Button Style="{StaticResource IconButton}" Content="1920×1080 (FHD)" FontSize="10.5" Padding="10,4"
+                                                                Margin="0,0,8,0" Command="{Binding SetInstanceWindowCommand}" CommandParameter="1920x1080"/>
+                                                        <TextBox x:Name="TxtInstWidth" Width="60" Height="30" FontSize="11" Text="1280"
+                                                                 LostFocus="InstSetting_Changed" TextChanged="InstSettingText_Changed"/>
+                                                        <TextBlock Text="✕" VerticalAlignment="Center" Margin="6,0" Foreground="#666677" FontSize="10"/>
+                                                        <TextBox x:Name="TxtInstHeight" Width="60" Height="30" FontSize="11" Text="720"
+                                                                 LostFocus="InstSetting_Changed" TextChanged="InstSettingText_Changed"/>
+                                                    </StackPanel>
+                                                </Grid>
+
+                                                <!-- Auto Server -->
+                                                <Grid Margin="0,0,0,4">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="185"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="Сервер подключения" VerticalAlignment="Center" FontSize="11.5" Foreground="#AAAAAA"/>
+                                                    <TextBox x:Name="TxtInstServer" Grid.Column="1" Height="36" FontSize="11.5"
+                                                             LostFocus="InstSetting_Changed" TextChanged="InstSettingText_Changed"/>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Card: Java & JVM -->
+                                        <Border CornerRadius="10" Padding="16" Margin="0,0,0,12" Background="#111116"
+                                                BorderBrush="#1F1F28" BorderThickness="1">
+                                            <StackPanel>
+                                                <TextBlock Text="JAVA И ПАРАМЕТРЫ ЗАПУСКА" Style="{StaticResource Caption}"/>
+
+                                                <!-- Java Path -->
+                                                <Grid Margin="0,4,0,10">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="185"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="Исполняемый файл Java" VerticalAlignment="Center" FontSize="11.5" Foreground="#AAAAAA"/>
+                                                    <TextBox x:Name="TxtInstJava" Grid.Column="1" Height="36" IsReadOnly="True" FontSize="11.5"/>
+                                                    <Button Grid.Column="2" Style="{StaticResource IconButton}" Content="Обзор..."
+                                                            FontSize="11" Padding="12,0" Height="36" Margin="8,0,0,0" Click="BtnInstJava_Click"/>
+                                                </Grid>
+
+                                                <!-- JVM Preset -->
+                                                <Grid Margin="0,0,0,10">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="185"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="Пресет оптимизации" VerticalAlignment="Center" FontSize="11.5" Foreground="#AAAAAA"/>
+                                                    <ComboBox x:Name="CbJvmPreset" Grid.Column="1" Height="36" FontSize="11.5"
+                                                              SelectionChanged="CbJvmPreset_Changed"/>
+                                                    <TextBlock x:Name="TxtJvmPresetInfo" Grid.Column="2" Text="" FontSize="10.5"
+                                                               Foreground="#777788" VerticalAlignment="Center" Margin="10,0,0,0" TextWrapping="Wrap" MaxWidth="180"/>
+                                                </Grid>
+
+                                                <!-- JVM Args -->
+                                                <Grid Margin="0,0,0,4">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="185"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="Аргументы JVM" VerticalAlignment="Center" FontSize="11.5" Foreground="#AAAAAA"/>
+                                                    <TextBox x:Name="TxtInstJvm" Grid.Column="1" Height="36" FontSize="11.5"
+                                                             LostFocus="InstSetting_Changed" TextChanged="InstSettingText_Changed"/>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Duplicate / Reset buttons -->
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Style="{StaticResource IconButton}" Content="Дублировать сборку" FontSize="11.5" Padding="14,7"
+                                                    Margin="0,0,8,0" Click="BtnDuplicateInstance_Click"/>
+                                            <Button Style="{StaticResource IconButton}" Content="Сбросить настройки" FontSize="11.5" Padding="14,7"
+                                                    Click="BtnResetInstance_Click"/>
+                                        </StackPanel>
+
+                                        <!-- Hidden legacy compatibility items for code-behind bindings -->
+                                        <Grid Visibility="Collapsed" IsHitTestVisible="False">
+                                            <StackPanel>
+                                                <TextBox x:Name="TxtInstanceSearch"/>
+                                                <Button x:Name="BtnDeleteInstance"/>
+                                                <TextBlock x:Name="TxtInstHealth" Text=""/>
+                                                <TextBlock x:Name="TxtStatTotal" Text=""/>
+                                                <TextBlock x:Name="TxtStatSessions" Text=""/>
+                                                <TextBlock x:Name="TxtStatAvg" Text=""/>
+                                                <TextBlock x:Name="TxtNoShots" Text=""/>
+                                                <TextBlock x:Name="TxtCountWorlds" Text="{Binding InstCountWorlds}"/>
+                                                <TextBlock x:Name="TxtInstSize" Text="{Binding InstSize}"/>
+                                                <TextBlock x:Name="TxtProfileInfo" Text=""/>
+                                                <ItemsControl x:Name="ItemsChart"/>
+                                                <ItemsControl x:Name="ItemsScreenshots"/>
+                                                <ItemsControl x:Name="ItemsColors"/>
+                                                <ComboBox x:Name="CbModProfile"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+
+                    <Grid x:Name="PageAccount" Grid.Row="0" Margin="0" Visibility="Collapsed">
+                        <Grid.Background>
+                            <ImageBrush ImageSource="pack://application:,,,/Assets/account_bg.jpg" Stretch="UniformToFill" Opacity="0.12"/>
+                        </Grid.Background>
+                        <Grid Margin="24,14,24,14">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Header -->
+                        <Grid Grid.Row="0" Margin="0,0,0,14">
+                            <StackPanel>
+                                <TextBlock Text="Профиль и Скин" FontSize="20" FontWeight="Bold" Foreground="White"/>
+                                <TextBlock Text="Авторизация, персонализация скина и 3D-рендер модели"
+                                           Foreground="#666" FontSize="11" Margin="0,3,0,0"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <Grid Margin="0,0,6,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="340"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" VerticalAlignment="Top">
+                                    <Border Background="#141418" BorderBrush="#26262E" BorderThickness="1"
+                                            CornerRadius="16" Padding="0" ClipToBounds="True">
+                                        <Grid>
+                                            <!-- Native 3D Viewport -->
+                                            <Grid x:Name="SkinViewerHost" Height="460" Background="#0A0A0E"
+                                                  MouseDown="SkinViewport_MouseDown" MouseMove="SkinViewport_MouseMove"
+                                                  MouseUp="SkinViewport_MouseUp" MouseWheel="SkinViewport_MouseWheel"
+                                                  Cursor="SizeAll">
+                                                <Viewport3D x:Name="SkinViewport3D" Visibility="Visible">
+                                                    <Viewport3D.Camera>
+                                                        <PerspectiveCamera x:Name="SkinCamera" Position="0, 0, 48" LookDirection="0, 0, -1" UpDirection="0, 1, 0" FieldOfView="45"/>
+                                                    </Viewport3D.Camera>
+                                                    <ModelVisual3D>
+                                                        <ModelVisual3D.Content>
+                                                            <Model3DGroup>
+                                                                <AmbientLight Color="#DDDDDD"/>
+                                                                <DirectionalLight Color="#666666" Direction="-1, -2, -3"/>
+                                                                <DirectionalLight Color="#444444" Direction="1, 1, 2"/>
+                                                            </Model3DGroup>
+                                                        </ModelVisual3D.Content>
+                                                    </ModelVisual3D>
+                                                    <ModelVisual3D x:Name="SkinModelVisual"/>
+                                                </Viewport3D>
+
+                                                <Grid x:Name="SkinViewerPlaceholder" Visibility="Visible" IsHitTestVisible="False">
+                                                    <Grid.Background>
+                                                        <ImageBrush ImageSource="pack://application:,,,/Assets/account_bg.jpg" Stretch="UniformToFill" Opacity="0.08"/>
+                                                    </Grid.Background>
+                                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                        <TextBlock Text="👤" FontSize="48" HorizontalAlignment="Center" Opacity="0.3"/>
+                                                        <TextBlock Text="Войдите, чтобы увидеть скин" FontSize="13" Foreground="#555"
+                                                                   TextAlignment="Center" Margin="0,8,0,0"/>
+                                                    </StackPanel>
+                                                </Grid>
+
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="12">
+                                                    <!-- Change Skin Button -->
+                                                    <Button x:Name="BtnBrowseSkin" Width="34" Height="34" Margin="0,0,6,0"
+                                                            Background="#E616161C" Foreground="White" BorderBrush="#33FFFFFF" BorderThickness="1"
+                                                            Cursor="Hand" ToolTip="Сменить скин (выбрать PNG-файл)"
+                                                            Click="BtnBrowseSkin_Click">
+                                                        <Button.Resources>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="CornerRadius" Value="8"/>
+                                                            </Style>
+                                                        </Button.Resources>
+                                                        <Image Source="pack://application:,,,/Assets/icon_skin_exploler.png" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                                    </Button>
+
+                                                    <!-- Model Toggle Button (Classic / Slim) -->
+                                                    <Button x:Name="BtnToggleModel" Height="34" Padding="10,0" Margin="0,0,6,0"
+                                                            Background="#E616161C" Foreground="White" BorderBrush="#33FFFFFF" BorderThickness="1"
+                                                            Cursor="Hand" ToolTip="Переключить модель Classic (4px) / Slim (3px)"
+                                                            Click="BtnToggleModel_Click">
+                                                        <Button.Resources>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="CornerRadius" Value="8"/>
+                                                            </Style>
+                                                        </Button.Resources>
+                                                        <TextBlock x:Name="TxtToggleModelBadge" Text="Classic" FontSize="11" FontWeight="Bold" Foreground="#ECECED" VerticalAlignment="Center"/>
+                                                    </Button>
+
+                                                    <!-- Wardrobe / Capes Button -->
+                                                    <Button x:Name="BtnWardrobe" Width="34" Height="34" Margin="0,0,6,0"
+                                                            Background="#E616161C" Foreground="White" BorderBrush="#33FFFFFF" BorderThickness="1"
+                                                            Cursor="Hand" ToolTip="Гардероб плащей (выбор плаща, промокоды)"
+                                                            Click="BtnWardrobe_Click">
+                                                        <Button.Resources>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="CornerRadius" Value="8"/>
+                                                            </Style>
+                                                        </Button.Resources>
+                                                        <Image Source="pack://application:,,,/Assets/icon_cape_button.png" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                                    </Button>
+
+                                                    <!-- Reset Skin Button -->
+                                                    <Button x:Name="BtnResetSkin" Width="34" Height="34"
+                                                            Background="#E616161C" Foreground="#AAA" BorderBrush="#33FFFFFF" BorderThickness="1"
+                                                            Cursor="Hand" ToolTip="↺ Сбросить на стандартный Steve / Alex"
+                                                            Click="BtnResetSkin_Click">
+                                                        <Button.Resources>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="CornerRadius" Value="8"/>
+                                                            </Style>
+                                                        </Button.Resources>
+                                                        <TextBlock Text="↺" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Button>
+                                                </StackPanel>                                                <!-- Cape Mode Overlay (hidden by default) -->
+                                                <Grid x:Name="CapeModeOverlay" Visibility="Collapsed" IsHitTestVisible="True">
+                                                    <!-- Left arrow -->
+                                                    <Button x:Name="BtnCapePrev" Width="50" Height="50"
+                                                            HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"
+                                                            Cursor="Hand" Click="BtnCapePrev_Click">
+                                                        <Button.Template>
+                                                            <ControlTemplate TargetType="Button">
+                                                                <TextBlock Text="‹" FontSize="30" FontWeight="Light" Foreground="#BBB"
+                                                                           VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                            </ControlTemplate>
+                                                        </Button.Template>
+                                                    </Button>
+
+                                                    <!-- Right arrow -->
+                                                    <Button x:Name="BtnCapeNext" Width="50" Height="50"
+                                                            HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0"
+                                                            Cursor="Hand" Click="BtnCapeNext_Click">
+                                                        <Button.Template>
+                                                            <ControlTemplate TargetType="Button">
+                                                                <TextBlock Text="›" FontSize="30" FontWeight="Light" Foreground="#BBB"
+                                                                           VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                            </ControlTemplate>
+                                                        </Button.Template>
+                                                    </Button>
+
+                                                    <!-- Confirm button -->
+                                                    <Button x:Name="BtnCapeConfirm" Width="180" Height="36"
+                                                            HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,16"
+                                                            Background="White" Foreground="Black" FontWeight="600" FontSize="12"
+                                                            BorderThickness="0" Cursor="Hand"
+                                                            Click="BtnCapeConfirm_Click">
+                                                        <Button.Resources>
+                                                            <Style TargetType="Border"><Setter Property="CornerRadius" Value="4"/></Style>
+                                                        </Button.Resources>
+                                                        <TextBlock x:Name="TxtCapeConfirmLabel" Text="ВЫБРАТЬ"/>
+                                                    </Button>
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Hidden elements for code-behind references -->
+                                    <StackPanel Visibility="Collapsed">
+                                        <TextBlock x:Name="TxtAccName"/>
+                                        <TextBlock x:Name="TxtAccType"/>
+                                        <TextBlock x:Name="TxtSkinModelBadge"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="TxtSkinStatus" Text="" FontSize="11" TextWrapping="Wrap"
+                                               Foreground="#888" Margin="0,8,0,0" HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <!-- RIGHT: Active Profile & Compact Auth Rows -->
+                                <StackPanel Grid.Column="1" Margin="20,0,0,0">
+
+                                    <!-- Active Account Card -->
+                                    <Border Background="#141418" BorderBrush="#26262E" BorderThickness="1"
+                                            CornerRadius="14" Padding="16" Margin="0,0,0,16">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Border Grid.Column="0" Width="44" Height="44" CornerRadius="8" Background="#1C1C24" BorderThickness="0" ClipToBounds="True">
+                                                <Image x:Name="ImgAvatarLarge" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased"/>
+                                            </Border>
+
+                                            <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
+                                                <TextBlock x:Name="TxtAuthState" Text="{Binding AuthState}" FontWeight="Bold" FontSize="13.5" Foreground="White" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="Быстрое переключение профилей в меню снизу слева" Foreground="#666" FontSize="11" Margin="0,2,0,0"/>
+                                            </StackPanel>
+
+                                            <Button x:Name="BtnLogout" Grid.Column="2" Content="Выйти"
+                                                    Background="Transparent" Foreground="#EF4444" BorderBrush="#3A2222" BorderThickness="1"
+                                                    Padding="14,6" FontSize="11.5" Cursor="Hand" Click="BtnLogout_Click" IsEnabled="False">
+                                                <Button.Resources>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="CornerRadius" Value="7"/>
+                                                    </Style>
+                                                </Button.Resources>
+                                            </Button>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Compact Auth Methods Container -->
+                                    <Border Background="#141418" BorderBrush="#26262E" BorderThickness="1" CornerRadius="14" Padding="16">
+                                        <StackPanel>
+                                            <TextBlock Text="ДОБАВИТЬ АККАУНТ" FontSize="10" FontWeight="Bold" Foreground="#555" Margin="0,0,0,14"/>
+
+                                            <!-- Method 1: Microsoft -->
+                                            <Grid Margin="0,0,0,12">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Border Grid.Column="0" Width="36" Height="36" CornerRadius="8" Background="#0078D4" VerticalAlignment="Center">
+                                                    <TextBlock Text="M" FontSize="16" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                                                    <TextBlock Text="Microsoft / Xbox Live" FontWeight="SemiBold" FontSize="13" Foreground="White"/>
+                                                    <TextBlock Text="Официальная лицензия Minecraft" Foreground="#777" FontSize="10.5" Margin="0,2,0,0"/>
+                                                </StackPanel>
+                                                <Button x:Name="BtnLogin" Grid.Column="2" Style="{StaticResource AccentButton}"
+                                                        Content="Войти" Padding="20,8" FontSize="12"
+                                                        Click="BtnLogin_Click" IsEnabled="True"/>
+                                            </Grid>
+
+                                            <!-- Divider -->
+                                            <Border Height="1" Background="#22222C" Margin="0,4,0,16"/>
+
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Border Grid.Column="0" Width="36" Height="36" CornerRadius="8" Background="#252530" BorderBrush="#3B3B48" BorderThickness="1" VerticalAlignment="Center">
+                                                    <TextBlock Text="V" FontSize="16" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                                                    <TextBlock Text="VEC ID (Колледж КПВК)" FontWeight="SemiBold" FontSize="13" Foreground="White"/>
+                                                    <TextBlock Text="Единый студенческий аккаунт сервера" Foreground="#777" FontSize="10.5" Margin="0,2,0,0"/>
+                                                </StackPanel>
+                                                <Button x:Name="BtnVecLogin" Grid.Column="2" Style="{StaticResource AccentButton}"
+                                                        Content="Войти" Padding="20,8" FontSize="12"
+                                                        Click="BtnVecLogin_Click"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                        </ScrollViewer>
+
+                        <!-- Hidden compatibility elements for code-behind bindings -->
+                        <Grid Visibility="Collapsed">
+                            <TextBlock x:Name="TxtAccUuid"/>
+                            <TextBlock x:Name="TxtAccUuidShort"/>
+                            <TextBlock x:Name="TxtSkinModel"/>
+                            <Image x:Name="ImgSkinPreview"/>
+                            <TextBlock x:Name="TxtSkinPlaceholder"/>
+                            <TextBox x:Name="TxtSkinPath"/>
+                            <Button x:Name="BtnUploadSkin"/>
+                            <TextBox x:Name="TxtOfflineName"/>
+                            <TextBlock x:Name="TxtOfflineHint"/>
+                            <StackPanel x:Name="StackSavedAccountsList"/>
+                            <TextBlock x:Name="TxtSavedAccountsCount"/>
+                        </Grid>
+                        </Grid>
+                    </Grid>
+
+                    <Grid x:Name="PageSettings" Grid.Row="0" Margin="24,14,18,0" Visibility="Collapsed">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Margin="0,0,6,0">
+                            <TextBlock Text="Настройки" Style="{StaticResource H1}"/>
+                            <TextBlock x:Name="TxtSettingsHint" Text="Изменения применяются и сохраняются сразу"
+                                       Foreground="{DynamicResource FgMuted}" FontSize="12" Margin="0,4,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,14,0,0">
+                            <Button Style="{StaticResource IconButton}" Content="Сбросить раздел"
+                                    Margin="0,0,16,0" Click="BtnResetSection_Click"
+                                    VerticalAlignment="Center"
+                                    ToolTip="Вернуть настройки этого раздела к значениям по умолчанию"/>
+                            <RadioButton x:Name="SecGame" Style="{StaticResource SegmentToggle}" Content="Игра"
+                                         IsChecked="True" Checked="SettingsSection_Checked" Tag="game"/>
+                            <RadioButton x:Name="SecJava" Style="{StaticResource SegmentToggle}" Content="Java и память"
+                                         Checked="SettingsSection_Checked" Tag="java"/>
+                            <RadioButton x:Name="SecStorage" Style="{StaticResource SegmentToggle}" Content="Хранилище"
+                                         Checked="SettingsSection_Checked" Tag="storage"/>
+                            <RadioButton x:Name="SecVersions" Style="{StaticResource SegmentToggle}" Content="Версии игры"
+                                         Checked="SettingsSection_Checked" Tag="versions"/>
+                            <RadioButton x:Name="SecMaint" Style="{StaticResource SegmentToggle}" Content="Обслуживание"
+                                         Checked="SettingsSection_Checked" Tag="maint"/>
+                        </StackPanel>
+
+                        <ScrollViewer Grid.Row="2" Margin="0,14,0,0" VerticalScrollBarVisibility="Auto">
+                            <Grid Margin="0,0,6,10">
+                                <StackPanel x:Name="SecPanelGame">
+                                    <Border Style="{StaticResource Card}">
+                                        <StackPanel>
+                                            <TextBlock Text="ОКНО ИГРЫ" Style="{StaticResource Caption}"/>
+                                            <Grid Margin="0,4,0,12">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                                    <TextBlock Text="Ширина (px)" FontSize="11" Foreground="#777788" Margin="0,0,0,5"/>
+                                                    <TextBox x:Name="TxtWidth" Width="100" Text="1280" LostFocus="Setting_Changed" TextChanged="SettingText_Changed"/>
+                                                </StackPanel>
+
+                                                <TextBlock Grid.Column="1" Text="✕" FontSize="11" Foreground="#555566" VerticalAlignment="Bottom" Margin="0,0,10,12"/>
+
+                                                <StackPanel Grid.Column="2" Margin="0,0,20,0">
+                                                    <TextBlock Text="Высота (px)" FontSize="11" Foreground="#777788" Margin="0,0,0,5"/>
+                                                    <TextBox x:Name="TxtHeight" Width="100" Text="720" LostFocus="Setting_Changed" TextChanged="SettingText_Changed"/>
+                                                </StackPanel>
+
+                                                <CheckBox x:Name="ChkFullscreen" Grid.Column="3" Content="Полный экран" VerticalAlignment="Bottom" Margin="0,0,0,10"
+                                                          Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                                            </Grid>
+
+                                            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                                <TextBlock Text="Пресеты:" FontSize="11" Foreground="#555566" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <Button Style="{StaticResource IconButton}" Content="1280×720 (HD)" Padding="8,4" FontSize="11" Margin="0,0,6,0" Command="{Binding SetResolutionCommand}" CommandParameter="1280x720"/>
+                                                <Button Style="{StaticResource IconButton}" Content="1600×900" Padding="8,4" FontSize="11" Margin="0,0,6,0" Command="{Binding SetResolutionCommand}" CommandParameter="1600x900"/>
+                                                <Button Style="{StaticResource IconButton}" Content="1920×1080 (FullHD)" Padding="8,4" FontSize="11" Command="{Binding SetResolutionCommand}" CommandParameter="1920x1080"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+                                        <StackPanel>
+                                            <TextBlock Text="ЗАПУСК" Style="{StaticResource Caption}"/>
+                                            <CheckBox x:Name="ChkAllowMultiple" Checked="Setting_Changed"
+                                                      Unchecked="Setting_Changed"
+                                                      Content="Разрешить несколько копий игры одновременно"/>
+                                            <TextBlock Text="Выключено — защита от случайного открытия десятков окон."
+                                                       Foreground="{DynamicResource FgMuted}" FontSize="11"
+                                                       Margin="27,4,0,0" TextWrapping="Wrap"/>
+
+                                            <CheckBox x:Name="ChkMinimizeOnLaunch" Margin="0,12,0,0"
+                                                      Checked="Setting_Changed" Unchecked="Setting_Changed"
+                                                      Content="Сворачивать лаунчер при старте игры"/>
+                                            <CheckBox x:Name="ChkConfirmStop" Margin="0,12,0,0"
+                                                      Checked="Setting_Changed" Unchecked="Setting_Changed"
+                                                      Content="Спрашивать подтверждение перед закрытием игры"/>
+                                            <CheckBox x:Name="ChkCloseOnLaunch" Margin="0,12,0,0"
+                                                      Checked="Setting_Changed" Unchecked="Setting_Changed"
+                                                      Content="Полностью закрывать лаунчер после запуска"/>
+                                            <CheckBox x:Name="ChkShowConsole" Margin="0,12,0,0"
+                                                      Checked="Setting_Changed" Unchecked="Setting_Changed"
+                                                      Content="Показывать консоль Java (для отладки)"/>
+                                            <CheckBox x:Name="ChkSnapshots" Margin="0,12,0,0"
+                                                      Checked="ChkSnapshots_Changed" Unchecked="ChkSnapshots_Changed"
+                                                      Content="Показывать снапшоты в списке версий"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+                                        <StackPanel>
+                                            <TextBlock Text="ЯЗЫК ИГРЫ" Style="{StaticResource Caption}"/>
+                                            <CheckBox x:Name="ChkAutoLanguage" Checked="Setting_Changed"
+                                                      Unchecked="Setting_Changed"
+                                                      Content="Ставить язык автоматически при первом запуске"/>
+                                            <TextBlock Text="Minecraft по умолчанию стартует на английском. Лаунчер заранее пропишет выбранный язык в options.txt, чтобы не менять вручную."
+                                                       Foreground="{DynamicResource FgMuted}" FontSize="11"
+                                                       Margin="27,4,0,0" TextWrapping="Wrap"/>
+                                            <StackPanel Orientation="Horizontal" Margin="27,10,0,0">
+                                                <RadioButton x:Name="RbLangRu" Style="{StaticResource SegmentToggle}"
+                                                             Content="Русский" IsChecked="True"
+                                                             Checked="GameLang_Checked" Tag="ru"/>
+                                                <RadioButton x:Name="RbLangEn" Style="{StaticResource SegmentToggle}"
+                                                             Content="English" Checked="GameLang_Checked" Tag="en"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+                                        <StackPanel>
+                                            <TextBlock Text="НОВЫЕ СБОРКИ" Style="{StaticResource Caption}"/>
+                                            <CheckBox x:Name="ChkDefaultIsolated" Checked="Setting_Changed"
+                                                      Unchecked="Setting_Changed"
+                                                      Content="Создавать изолированными по умолчанию"/>
+                                            <TextBlock Text="Изолированная сборка хранит свои библиотеки, ассеты и версии внутри своей папки. Надёжнее, но занимает больше места."
+                                                       Foreground="{DynamicResource FgMuted}" FontSize="11"
+                                                       Margin="27,4,0,0" TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+
+                                <StackPanel x:Name="SecPanelJava" Visibility="Collapsed">
+                                    <Border Style="{StaticResource Card}">
+                                        <StackPanel>
+                                            <TextBlock Text="ОПЕРАТИВНАЯ ПАМЯТЬ" Style="{StaticResource Caption}"/>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Slider x:Name="SldMemory" Grid.Column="0" Minimum="1024" Maximum="16384"
+                                                        TickFrequency="512" IsSnapToTickEnabled="True" Value="4096"
+                                                        ValueChanged="SldMemory_ValueChanged" VerticalAlignment="Center"/>
+                                                <TextBlock x:Name="TxtMemory" Grid.Column="1" Text="4096 МБ" Width="88"
+                                                           TextAlignment="Right" VerticalAlignment="Center"
+                                                           FontWeight="SemiBold"/>
+                                            </Grid>
+                                            <TextBlock x:Name="TxtMemoryHint" Text="" Foreground="{DynamicResource FgMuted}"
+                                                       FontSize="11" Margin="0,8,0,0" TextWrapping="Wrap"/>
+                                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                                <Button Style="{StaticResource IconButton}" Content="2 ГБ"
+                                                        Margin="0,0,6,0" Command="{Binding SetMemoryCommand}" CommandParameter="2048"/>
+                                                <Button Style="{StaticResource IconButton}" Content="4 ГБ"
+                                                        Margin="0,0,6,0" Command="{Binding SetMemoryCommand}" CommandParameter="4096"/>
+                                                <Button Style="{StaticResource IconButton}" Content="8 ГБ"
+                                                        Margin="0,0,6,0" Command="{Binding SetMemoryCommand}" CommandParameter="8192"/>
+                                                <Button Style="{StaticResource IconButton}" Content="Авто"
+                                                        Command="{Binding SetMemoryAutoCommand}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+                                        <StackPanel>
+                                            <Grid>
+                                                <TextBlock Text="УСТАНОВЛЕННЫЕ JAVA" Style="{StaticResource Caption}"/>
+                                                <Button Style="{StaticResource IconButton}" Content="Искать заново"
+                                                        HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                        Margin="0,-6,0,0" Command="{Binding RescanJavaCommand}"/>
+                                            </Grid>
+                                            <TextBlock x:Name="TxtJavaList" Text="{Binding JavaList}"
+                                                       Foreground="{DynamicResource FgMuted}" FontSize="11.5"
+                                                       TextWrapping="Wrap"/>
+                                            <TextBlock Text="Свой путь к java.exe (пусто = автоподбор)"
+                                                       Foreground="{DynamicResource FgMuted}" FontSize="11.5"
+                                                       Margin="0,14,0,6"/>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBox x:Name="TxtJavaPath" Grid.Column="0" LostFocus="Setting_Changed" TextChanged="SettingText_Changed"/>
+                                                <Button Grid.Column="1" Style="{StaticResource IconButton}"
+                                                        Content="Обзор" Margin="8,0,0,0" Command="{Binding BrowseJavaCommand}"/>
+                                                <Button Grid.Column="2" Style="{StaticResource IconButton}"
+                                                        Content="Сброс" Margin="8,0,0,0" Command="{Binding ClearJavaPathCommand}"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+                                        <StackPanel>
+                                            <TextBlock Text="АРГУМЕНТЫ JVM" Style="{StaticResource Caption}"/>
+                                            <TextBox x:Name="TxtJvmArgs" LostFocus="Setting_Changed" TextChanged="SettingText_Changed"/>
+                                            <TextBlock Text="Добавляются к стандартным. Пример: -XX:+UseZGC"
+                                                       Foreground="{DynamicResource FgMuted}" FontSize="11"
+                                                       Margin="0,6,0,0"/>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+
+
+                                <StackPanel x:Name="SecPanelMaint" Visibility="Collapsed">
+                                    <Border Style="{StaticResource Card}">
+                                        <StackPanel>
+                                            <Grid>
+                                                <TextBlock Text="ЧТО ЗАНИМАЕТ МЕСТО" Style="{StaticResource Caption}"/>
+                                                <Button Style="{StaticResource IconButton}" Content="Пересчитать"
+                                                        HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                        Margin="0,-4,0,0" Click="BtnScanMaint_Click"/>
+                                            </Grid>
+                                            <TextBlock x:Name="TxtMaintTotal" Text="Нажмите «Пересчитать»"
+                                                        Foreground="#777788" FontSize="11.5"
+                                                        Margin="0,0,0,12"/>
+
+                                            <ItemsControl x:Name="ItemsMaint">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border Background="#111116" CornerRadius="8"
+                                                                Padding="10,8" Margin="0,0,0,6" BorderThickness="1"
+                                                                BorderBrush="#1F1F28">
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                    <ColumnDefinition Width="*"/>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <CheckBox Grid.Column="0" IsChecked="{Binding Checked, Mode=OneTime}"
+                                                                          VerticalAlignment="Center" Tag="{Binding Key}"
+                                                                          Checked="MaintItem_Changed"
+                                                                          Unchecked="MaintItem_Changed"/>
+
+                                                                <StackPanel Grid.Column="1" Margin="10,0,10,0"
+                                                                            VerticalAlignment="Center">
+                                                                    <TextBlock Text="{Binding Title}" FontSize="12"
+                                                                               FontWeight="SemiBold"
+                                                                               Foreground="#FFFFFF"/>
+                                                                    <TextBlock Text="{Binding Description}" FontSize="10.5"
+                                                                               Foreground="#777788"
+                                                                               Margin="0,2,0,0" TextWrapping="Wrap"/>
+                                                                </StackPanel>
+
+                                                                <TextBlock Grid.Column="2" Text="{Binding SizeText}"
+                                                                           FontSize="11.5" FontWeight="SemiBold"
+                                                                           VerticalAlignment="Center"
+                                                                           Foreground="#FFFFFF"/>
+                                                            </Grid>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+
+                                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                                <Button Style="{StaticResource IconButton}" Content="Выбрать безопасное"
+                                                        Margin="0,0,8,0" Click="BtnMaintSafe_Click"/>
+                                                <Button Style="{StaticResource DangerButton}" Content="Удалить выбранное"
+                                                        Click="BtnMaintClean_Click"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+                                        <StackPanel>
+                                            <TextBlock Text="ПОЛНЫЙ СБРОС И УДАЛЕНИЕ" Style="{StaticResource Caption}"/>
+                                            <TextBlock Text="Эти действия необратимы. Игровые миры и моды будут потеряны."
+                                                       Foreground="#F87171" FontSize="11"
+                                                       Margin="0,0,0,10" TextWrapping="Wrap"/>
+
+                                            <Button Style="{StaticResource IconButton}"
+                                                    Content="Переустановить начисто (сохранить сборки)"
+                                                    HorizontalContentAlignment="Left" Margin="0,0,0,6"
+                                                    Click="BtnReinstallSoft_Click"/>
+                                            <Button Style="{StaticResource DangerButton}"
+                                                    Content="Полная переустановка (удалить всё)"
+                                                    HorizontalContentAlignment="Left" Margin="0,0,0,6"
+                                                    Click="BtnReinstallFull_Click"/>
+                                            <Button Style="{StaticResource DangerButton}"
+                                                    Content="Удалить лаунчер с компьютера"
+                                                    HorizontalContentAlignment="Left"
+                                                    Click="BtnUninstall_Click"/>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+
+                                <StackPanel x:Name="SecPanelVersions" Visibility="Collapsed">
+                                    <Border Style="{StaticResource Card}">
+                                        <StackPanel>
+                                            <Grid>
+                                                <TextBlock Text="УСТАНОВЛЕННЫЕ ВЕРСИИ" Style="{StaticResource Caption}"/>
+                                                <Button Style="{StaticResource IconButton}" Content="Обновить список"
+                                                        HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                        Margin="0,-4,0,0" Click="BtnScanVersions_Click"/>
+                                            </Grid>
+                                            <TextBlock x:Name="TxtVersionsSummary" Text="Нажмите «Обновить список»"
+                                                        Foreground="#777788" FontSize="11.5"
+                                                        Margin="0,0,0,10"/>
+
+                                            <ItemsControl x:Name="ItemsVersions">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border Background="#111116" CornerRadius="8"
+                                                                Padding="10,8" Margin="0,0,0,6" BorderThickness="1"
+                                                                BorderBrush="#1F1F28">
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                    <ColumnDefinition Width="*"/>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <Border Grid.Column="0" Width="36" Height="36" CornerRadius="6"
+                                                                        Background="#16161E" BorderThickness="0" ClipToBounds="True">
+                                                                    <Image Source="{Binding IconSource}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                                                </Border>
+
+                                                                <StackPanel Grid.Column="1" Margin="11,0,10,0"
+                                                                            VerticalAlignment="Center">
+                                                                    <StackPanel Orientation="Horizontal">
+                                                                        <TextBlock Text="{Binding Id}" FontSize="12"
+                                                                                   FontWeight="SemiBold"
+                                                                                   Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                                                                        <Border Margin="6,0,0,0" CornerRadius="4" Padding="5,1.5" Background="#1A1A24" BorderBrush="#2A2A38" BorderThickness="1" VerticalAlignment="Center">
+                                                                            <TextBlock Text="{Binding Kind}" FontSize="9" FontWeight="SemiBold" Foreground="#AAAAAA"/>
+                                                                        </Border>
+                                                                    </StackPanel>
+                                                                    <TextBlock Text="{Binding Info}" FontSize="10.5"
+                                                                               Foreground="#777788"
+                                                                               Margin="0,2,0,0" TextWrapping="Wrap"/>
+                                                                </StackPanel>
+
+                                                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                                                    <Button Content="Папка"
+                                                                            Style="{StaticResource IconButton}" Padding="9,5" FontSize="11"
+                                                                            Click="VersionOpen_Click"
+                                                                            Tag="{Binding Dir}"/>
+                                                                    <Button Content="Удалить"
+                                                                            Style="{StaticResource DangerButton}"
+                                                                            Margin="6,0,0,0" Padding="9,5" FontSize="11"
+                                                                            Click="VersionDelete_Click"
+                                                                            Tag="{Binding Id}"/>
+                                                                </StackPanel>
+                                                            </Grid>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+
+                                <StackPanel x:Name="SecPanelStorage" Visibility="Collapsed">
+                                    <Border Style="{StaticResource Card}">
+                                        <StackPanel>
+                                            <TextBlock Text="ПАПКА ЛАУНЧЕРА" Style="{StaticResource Caption}"/>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBox x:Name="TxtGameDir" Grid.Column="0" IsReadOnly="True"/>
+                                                <Button Grid.Column="1" Style="{StaticResource IconButton}"
+                                                        Content="Открыть" Margin="8,0,0,0" Command="{Binding OpenGameDirCommand}"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+                                        <StackPanel>
+                                            <TextBlock Text="ПОРТАТИВНЫЙ РЕЖИМ" Style="{StaticResource Caption}"/>
+                                            <TextBlock x:Name="TxtPortableState" Text=""
+                                                       Foreground="{DynamicResource FgMuted}" FontSize="11.5"
+                                                       TextWrapping="Wrap" Margin="0,0,0,10"/>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button x:Name="BtnPortableToggle" Style="{StaticResource IconButton}"
+                                                        Content="Включить портативный режим"
+                                                        Click="BtnPortableToggle_Click"/>
+                                            </StackPanel>
+                                            <TextBlock Text="Данные будут храниться рядом с лаунчером — можно носить на флешке вместе со сборками."
+                                                       Foreground="{DynamicResource FgMuted}" FontSize="10.5"
+                                                       Margin="0,8,0,0" TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+                                        <StackPanel>
+                                            <Grid>
+                                                <TextBlock Text="ЗАНЯТОЕ МЕСТО" Style="{StaticResource Caption}"/>
+                                                <Button Style="{StaticResource IconButton}" Content="Пересчитать"
+                                                        HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                        Margin="0,-6,0,0" Click="BtnCalcSize_Click"/>
+                                            </Grid>
+                                            <TextBlock x:Name="TxtStorageInfo" Text="Нажмите «Пересчитать»"
+                                                       Foreground="{DynamicResource FgMuted}" FontSize="11.5"
+                                                       TextWrapping="Wrap" LineHeight="19"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+                                        <StackPanel>
+                                            <TextBlock Text="ПРОМО-КОД (ПЛАЩ)" Style="{StaticResource Caption}"/>
+                                            <TextBlock Text="Введите код для получения плаща." FontSize="11"
+                                                       Foreground="{DynamicResource FgMuted}" Margin="0,0,0,8"/>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBox x:Name="TxtPromoCode" Grid.Column="0" Margin="0,0,8,0" VerticalContentAlignment="Center"/>
+                                                <Button x:Name="BtnRedeemPromo" Grid.Column="1" Style="{StaticResource IconButton}" Content="Активировать"
+                                                        Click="BtnRedeemPromo_Click" Padding="14,6" VerticalAlignment="Center"/>
+                                            </Grid>
+                                            <TextBlock x:Name="TxtPromoStatus" Text="" Margin="0,8,0,0"
+                                                       Foreground="{DynamicResource FgMuted}" FontSize="11.5" TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+                                        <StackPanel>
+                                            <TextBlock Text="ОБСЛУЖИВАНИЕ" Style="{StaticResource Caption}"/>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Style="{StaticResource IconButton}" Content="Очистить кэш"
+                                                        Margin="0,0,8,0" Click="BtnClearCache_Click"/>
+                                                <Button Style="{StaticResource IconButton}" Content="Проверить Modrinth"
+                                                        Margin="0,0,8,0" Click="BtnCheckCurse_Click"/>
+                                                <Button Style="{StaticResource DangerButton}" Content="Сбросить настройки"
+                                                        Click="BtnResetSettings_Click"/>
+                                            </StackPanel>
+                                            <TextBlock x:Name="TxtMaintenance" Text="" Margin="0,10,0,0"
+                                                       Foreground="{DynamicResource FgMuted}" FontSize="11.5"
+                                                       TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                        </ScrollViewer>
+                    </Grid>
+
+                    <Grid x:Name="PageConsole" Grid.Row="0" Margin="24,14,24,0" Visibility="Collapsed">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0">
+                            <StackPanel>
+                                <TextBlock Text="Консоль" Style="{StaticResource H1}"/>
+                                <TextBlock x:Name="TxtLogInfo" Text="{Binding LogInfo}"
+                                           Foreground="{DynamicResource FgMuted}" FontSize="12" Margin="0,4,0,0"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                <RadioButton x:Name="LogAll" Style="{StaticResource SegmentToggle}"
+                                             Content="Всё" IsChecked="True" Checked="LogFilter_Checked" Tag="all"/>
+                                <RadioButton x:Name="LogWarn" Style="{StaticResource SegmentToggle}"
+                                             Content="Предупреждения" Checked="LogFilter_Checked" Tag="warn"/>
+                                <RadioButton x:Name="LogErr" Style="{StaticResource SegmentToggle}"
+                                             Content="Ошибки" Checked="LogFilter_Checked" Tag="error"/>
+                                <Button x:Name="BtnOpenLogFile" Style="{StaticResource IconButton}"
+                                        Content="Файл лога" Margin="10,0,8,0" Command="{Binding OpenLogFileCommand}"/>
+                                <Button x:Name="BtnClearLog" Style="{StaticResource IconButton}"
+                                        Content="Очистить" Command="{Binding DoClearLogCommand}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Border Grid.Row="1" Margin="0,14,0,0" Background="{DynamicResource ConsoleBg}"
+                                BorderBrush="{DynamicResource BorderBrushDark}" BorderThickness="1" CornerRadius="10">
+                            <ScrollViewer x:Name="ScrollLog" VerticalScrollBarVisibility="Auto" Margin="4">
+                                <TextBox x:Name="TxtLog" Background="Transparent" BorderThickness="0"
+                                         Foreground="{DynamicResource ConsoleFg}" FontFamily="Consolas" FontSize="11.5"
+                                         IsReadOnly="True" TextWrapping="NoWrap" VerticalContentAlignment="Top"
+                                         VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto"/>
+                            </ScrollViewer>
+                        </Border>
+                    </Grid>
+
+                    <Grid x:Name="PageMods" Grid.Row="0" Margin="0" Visibility="Collapsed">
+                        <Grid.Background>
+                            <ImageBrush ImageSource="pack://application:,,,/Assets/mods_menu_bg.jpg" Stretch="UniformToFill" Opacity="0.15"/>
+                        </Grid.Background>
+                        <Grid Margin="20,14,20,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0" Margin="0,0,0,14">
+                            <StackPanel>
+                                <TextBlock Text="Моды и Контент" Style="{StaticResource H1}"/>
+                                <TextBlock x:Name="TxtModsSubtitle" Text="Поиск и установка дополнений с Modrinth" Foreground="#777788" FontSize="11.5" Margin="0,4,0,0"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                <Button Style="{StaticResource IconButton}" Content="Импорт .jar"
+                                        FontSize="11" Padding="12,5" Click="BtnImportMod_Click"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="ModSearchBar" Grid.Row="1" Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox x:Name="TxtModSearch" Grid.Column="0" Height="36"
+                                     KeyDown="TxtModSearch_KeyDown"
+                                     TextChanged="TxtModSearch_TextChanged"
+                                     FontSize="12" Padding="12,0"
+                                     VerticalContentAlignment="Center"/>
+
+                            <ComboBox x:Name="CbModType" Grid.Column="1" Width="130" Height="36" Margin="8,0,0,0"
+                                      FontSize="11" SelectionChanged="ModFilter_Changed">
+                                <ComboBoxItem Content="Моды" IsSelected="True" Tag="0"/>
+                                <ComboBoxItem Content="Ресурспаки" Tag="1"/>
+                                <ComboBoxItem Content="Шейдеры" Tag="2"/>
+                            </ComboBox>
+
+                            <ComboBox x:Name="CbModSource" Grid.Column="2" Width="120" Height="36" Margin="8,0,0,0"
+                                      FontSize="11" SelectionChanged="ModFilter_Changed">
+                                <ComboBoxItem Content="Все" IsSelected="True" Tag="all"/>
+                                <ComboBoxItem Content="Modrinth" Tag="modrinth"/>
+                            </ComboBox>
+
+                            <Button x:Name="BtnModSearch" Grid.Column="3" Style="{StaticResource AccentButton}"
+                                    Content="Найти" Height="36" MinWidth="90" Margin="8,0,0,0"
+                                    Click="BtnModSearchNew_Click"/>
+                        </Grid>
+
+                        <!-- Catalog -->
+                        <Grid x:Name="PanelBrowse" Grid.Row="2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <ScrollViewer x:Name="ModScroll" Grid.Row="0" VerticalScrollBarVisibility="Auto">
+                                <StackPanel Margin="0,0,6,10">
+                                    <TextBlock x:Name="TxtModStatus" Text="Введите запрос и нажмите «Найти»."
+                                               Foreground="#777788" FontSize="11.5" TextWrapping="Wrap" Margin="2,0,0,10"/>
+
+                                    <ItemsControl x:Name="ItemsMods">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#111116" CornerRadius="8" Padding="12"
+                                                        Margin="0,0,0,8" BorderBrush="#1F1F28" BorderThickness="1">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <Border Grid.Column="0" Width="46" Height="46" CornerRadius="6"
+                                                                Background="#16161E" BorderThickness="0" ClipToBounds="True">
+                                                            <Grid>
+                                                                <Image Source="{Binding Icon}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                                                <TextBlock Text="{Binding Initial}" FontSize="16"
+                                                                           FontWeight="Bold" Foreground="#555566"
+                                                                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                           Visibility="{Binding PlaceholderVisibility}"/>
+                                                            </Grid>
+                                                        </Border>
+
+                                                        <StackPanel Grid.Column="1" Margin="12,0,12,0" VerticalAlignment="Center">
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="12.5" Foreground="#FFFFFF"/>
+                                                                <Border CornerRadius="4" Padding="5,1.5" Margin="8,0,0,0"
+                                                                        Background="#1A1A24" BorderBrush="#2A2A38" BorderThickness="1">
+                                                                    <TextBlock Text="{Binding Source}" FontSize="9" FontWeight="SemiBold" Foreground="#AAAAAA"/>
+                                                                </Border>
+                                                            </StackPanel>
+                                                            <TextBlock Text="{Binding Summary}" FontSize="11"
+                                                                       Foreground="#777788" Margin="0,3,0,0" TextWrapping="Wrap"
+                                                                       MaxHeight="32" TextTrimming="CharacterEllipsis"/>
+                                                            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                                                <TextBlock Text="{Binding DownloadsText}" FontSize="10" Foreground="#555566"/>
+                                                                <TextBlock Text="{Binding AuthorText}" FontSize="10" Foreground="#555566" Margin="10,0,0,0"/>
+                                                            </StackPanel>
+                                                        </StackPanel>
+
+                                                        <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                                            <Button MinWidth="96" Height="30" Style="{StaticResource AccentButton}"
+                                                                    Content="Установить" FontSize="11"
+                                                                    Click="ModInstall_Click" Tag="{Binding Index}"/>
+                                                            <Grid Margin="0,5,0,0">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*"/>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                </Grid.ColumnDefinitions>
+                                                                <Button Grid.Column="0" Content="Открыть" FontSize="10.5" Padding="6,3"
+                                                                        Style="{StaticResource IconButton}"
+                                                                        Click="ModPageInApp_Click" Tag="{Binding Index}"/>
+                                                                <Button Grid.Column="1" FontSize="10.5" Padding="6,3"
+                                                                        Style="{StaticResource IconButton}"
+                                                                        Margin="4,0,0,0"
+                                                                        Click="ModPage_Click" Tag="{Binding PageUrl}">
+                                                                    <TextBlock Text="↗" FontSize="11" Foreground="#AAAAAA"/>
+                                                                </Button>
+                                                            </Grid>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </ScrollViewer>
+
+                            <Border x:Name="ModPager" Grid.Row="1" Visibility="Collapsed"
+                                    Background="#111116" CornerRadius="8" Padding="6"
+                                    Margin="0,4,6,6" BorderBrush="#1F1F28" BorderThickness="1">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Button x:Name="BtnPrevPage" Width="30" Height="26" Cursor="Hand"
+                                            Background="Transparent" BorderThickness="0"
+                                            Click="BtnPrevPage_Click">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="Bd" Background="Transparent" CornerRadius="5">
+                                                    <TextBlock Text="←" FontSize="11" Foreground="#AAAAAA" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Bd" Property="Background" Value="#1A1A24"/></Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                    <StackPanel x:Name="PageButtons" Orientation="Horizontal" Margin="4,0"/>
+                                    <Button x:Name="BtnNextPage" Width="30" Height="26" Cursor="Hand"
+                                            Background="Transparent" BorderThickness="0"
+                                            Click="BtnNextPage_Click">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="Bd" Background="Transparent" CornerRadius="5">
+                                                    <TextBlock Text="→" FontSize="11" Foreground="#AAAAAA" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Bd" Property="Background" Value="#1A1A24"/></Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                        </Grid>
+                    </Grid>
+
+                    <Grid x:Name="PageContent" Grid.Row="0" Margin="0" Visibility="Collapsed"
+                          AllowDrop="True" Drop="Content_Drop" DragOver="Content_DragOver">
+                        <Grid.Background>
+                            <ImageBrush ImageSource="pack://application:,,,/Assets/rp_shader_bg.png" Stretch="UniformToFill" Opacity="0.15"/>
+                        </Grid.Background>
+                        <Grid Margin="20,14,20,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0" Margin="0,0,0,14">
+                            <StackPanel>
+                                <TextBlock Text="Контент сборки" Style="{StaticResource H1}"/>
+                                <TextBlock x:Name="TxtContentSubtitle" Text="Управление модами, ресурспаками и шейдерами текущей сборки"
+                                           Foreground="#777788" FontSize="11.5" Margin="0,4,0,0"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                <Button Style="{StaticResource IconButton}" Content="Импорт" FontSize="11" Padding="10,5"
+                                        Margin="0,0,6,0" Click="BtnImportMod_Click"/>
+                                <Button Style="{StaticResource IconButton}" Content="Папка" FontSize="11" Padding="10,5"
+                                        Margin="0,0,6,0" Click="BtnOpenContentFolder_Click"/>
+                                <Button Style="{StaticResource IconButton}" Content="Обновить" FontSize="11" Padding="10,5"
+                                        Click="BtnRefreshContent_Click"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Tabs -->
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
+                            <RadioButton x:Name="CtMods" Style="{StaticResource SegmentToggle}" Content="Моды"
+                                         IsChecked="True" Checked="ContentKind_Checked" Tag="mods"/>
+                            <RadioButton x:Name="CtRp" Style="{StaticResource SegmentToggle}" Content="Ресурспаки"
+                                         Checked="ContentKind_Checked" Tag="rp"/>
+                            <RadioButton x:Name="CtShaders" Style="{StaticResource SegmentToggle}" Content="Шейдеры"
+                                         Checked="ContentKind_Checked" Tag="shaders"/>
+                        </StackPanel>
+
+                        <!-- Content list -->
+                        <Border Grid.Row="2" Background="Transparent">
+                            <Grid>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <StackPanel Margin="0,0,6,10">
+                                        <TextBlock x:Name="TxtContentStatus" Text="" Foreground="#777788" FontSize="11.5" Margin="2,0,0,10"/>
+
+                                        <ItemsControl x:Name="ItemsContent">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Background="#111116" CornerRadius="8" Padding="10,8"
+                                                            Margin="0,0,0,6" BorderBrush="#1F1F28" BorderThickness="1">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <!-- Icon -->
+                                                            <Border Grid.Column="0" Width="38" Height="38" CornerRadius="6"
+                                                                    Background="#16161E" BorderThickness="0" ClipToBounds="True">
+                                                                <Grid>
+                                                                    <Image Source="{Binding IconImage}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                                                    <Image Source="pack://application:,,,/Assets/default_content_icon.jpg"
+                                                                           Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality"
+                                                                           Visibility="{Binding DefaultIconVisibility}"/>
+                                                                </Grid>
+                                                            </Border>
+
+                                                            <StackPanel Grid.Column="1" Margin="11,0,10,0" VerticalAlignment="Center">
+                                                                <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold"
+                                                                           Foreground="#FFFFFF" TextTrimming="CharacterEllipsis"/>
+                                                                <TextBlock Text="{Binding Info}" FontSize="10.5" Foreground="#777788"
+                                                                           Margin="0,2,0,0"/>
+                                                            </StackPanel>
+
+                                                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                                                <Button FontSize="10.5" Padding="8,4" Style="{StaticResource IconButton}"
+                                                                        Click="ContentToggle_Click" Tag="{Binding Path}"
+                                                                        Visibility="{Binding ToggleVisibility}">
+                                                                    <TextBlock Text="{Binding ToggleText}" Foreground="#AAAAAA"/>
+                                                                </Button>
+                                                                <Button FontSize="10.5" Padding="8,4" Margin="4,0,0,0"
+                                                                        Style="{StaticResource IconButton}"
+                                                                        Click="ContentReveal_Click" Tag="{Binding Path}">
+                                                                    <TextBlock Text="📁" FontSize="11"/>
+                                                                </Button>
+                                                                <Button FontSize="10.5" Padding="8,4" Margin="4,0,0,0"
+                                                                        Style="{StaticResource DangerButton}"
+                                                                        Click="ContentDelete_Click" Tag="{Binding Path}">
+                                                                    <TextBlock Text="✕" FontSize="11"/>
+                                                                </Button>
+                                                            </StackPanel>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </ScrollViewer>
+
+                                <!-- Drop hint -->
+                                <Border x:Name="DropHint" Visibility="Collapsed" CornerRadius="10"
+                                        Background="#EE0B0B0E" BorderThickness="1.5" BorderBrush="#333344">
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                        <TextBlock Text="📥" FontSize="32" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="Перетащите файлы сюда" FontSize="13" FontWeight="Bold"
+                                                   Margin="0,8,0,0" Foreground="#FFFFFF"/>
+                                        <TextBlock x:Name="TxtDropTarget" Text="" FontSize="11" Margin="0,4,0,0"
+                                                   HorizontalAlignment="Center" Foreground="#777788"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Border>
+                        </Grid>
+                    </Grid>
+
+
+
+                    <Grid x:Name="PageSkins" Grid.Row="0" Margin="20,12,20,0" Visibility="Collapsed">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Скины" Style="{StaticResource H1}"/>
+                            <TextBlock x:Name="TxtSkinTabStatus" Grid.Column="1" VerticalAlignment="Center"
+                                       Margin="16,0,0,0" TextWrapping="Wrap" MaxWidth="380"
+                                       Foreground="{DynamicResource FgMuted}" FontSize="11"/>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                <Border x:Name="SkinsPreviewBorder" Width="48" Height="48" CornerRadius="8" Background="#262B34" BorderBrush="{DynamicResource BorderBrushDark}" BorderThickness="1" ClipToBounds="True">
+                                    <Image x:Name="ImgSkinsPreview" Stretch="UniformToFill"/>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
+                        </StackPanel>
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <Grid x:Name="PanelSkinLocal" Visibility="Visible">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0" Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0" Style="{StaticResource BaseButton}" Content="Импортировать скин" Click="BtnImportSkin_Click" Height="36" Padding="16,0" HorizontalAlignment="Left"/>
+                                    <Button Grid.Column="1" Style="{StaticResource IconButton}" Content="🔄" Click="BtnRefreshLocalSkins_Click" Height="36" Width="36"/>
+                                </Grid>
+                                <WrapPanel x:Name="LocalSkinsPanel" Grid.Row="1"/>
+                            </Grid>
+                            
+                            <Border Grid.Column="1" x:Name="SkinPreviewPanelNew" Width="252" Margin="12,0,0,0"
+                                    Style="{StaticResource Card}" Padding="14" Visibility="Collapsed">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Border Grid.Row="0" Background="#262B34" CornerRadius="8" Margin="0,0,0,10" ClipToBounds="True">
+                                        <Image x:Name="ImgNewSkinPreview" Width="110" Height="220" Stretch="Uniform"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="1" x:Name="TxtNewSkinName" Text="" FontWeight="SemiBold" FontSize="13" TextAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Grid.Row="2" x:Name="TxtNewSkinInfo" Text="" Foreground="{DynamicResource FgMuted}" FontSize="11" Margin="0,4,0,0" TextAlignment="Center" TextWrapping="Wrap"/>
+                                    <Grid Grid.Row="3" Margin="0,12,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Button x:Name="BtnApplySkinNew" Style="{StaticResource AccentButton}" Content="Надеть скин" Height="38" Click="BtnApplySkin_Click" IsEnabled="False"/>
+                                        <Button x:Name="BtnResetSkinNew" Grid.Column="1" Style="{StaticResource BaseButton}" Content="По умолчанию" Height="38" Margin="8,0,0,0" Padding="10,0" Click="BtnResetSkinNew_Click" Visibility="Collapsed" ToolTip="Вернуть стандартный скин"/>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Grid>
+
+                <Border Grid.Column="1" Background="#0C0C0E" BorderBrush="{DynamicResource BorderBrushDark}" BorderThickness="1,0,0,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Margin="14,14,14,8">
+                            <TextBlock Text="МЕНЮ" FontSize="9.5" FontWeight="Bold" Foreground="#444455"/>
+                        </StackPanel>
+
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="0,0,0,10">
+                                <RadioButton x:Name="NavHome" Style="{StaticResource NavToggleDiscord}" IsChecked="True" Checked="Nav_Checked" Tag="0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="pack://application:,,,/Assets/main_page.png" Width="18" Height="18" Margin="0,0,8,0" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                        <TextBlock Text="Главная" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </RadioButton>
+                                <RadioButton x:Name="NavInstances" Style="{StaticResource NavToggleDiscord}" Checked="Nav_Checked" Tag="1">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="pack://application:,,,/Assets/version_page.png" Width="18" Height="18" Margin="0,0,8,0" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                        <TextBlock Text="Сборки / Версия" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </RadioButton>
+                                <RadioButton x:Name="NavMods" Style="{StaticResource NavToggleDiscord}" Checked="Nav_Checked" Tag="6">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="pack://application:,,,/Assets/mods_page.png" Width="18" Height="18" Margin="0,0,8,0" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                        <TextBlock Text="Моды / Контент" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </RadioButton>
+                                <RadioButton x:Name="NavContent" Style="{StaticResource NavToggleDiscord}" Checked="Nav_Checked" Tag="7">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="pack://application:,,,/Assets/content_page.png" Width="18" Height="18" Margin="0,0,8,0" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                        <TextBlock Text="Контент сборки" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </RadioButton>
+                                <RadioButton x:Name="NavAccount" Style="{StaticResource NavToggleDiscord}" Checked="Nav_Checked" Tag="3">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="pack://application:,,,/Assets/profile_page.png" Width="18" Height="18" Margin="0,0,8,0" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                        <TextBlock Text="Профиль" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </RadioButton>
+                                <RadioButton x:Name="NavSettings" Style="{StaticResource NavToggleDiscord}" Checked="Nav_Checked" Tag="4">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="pack://application:,,,/Assets/setting_page.png" Width="18" Height="18" Margin="0,0,8,0" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                        <TextBlock Text="Настройки" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </RadioButton>
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <Border x:Name="BorderSideUser" Grid.Row="2" Background="#0A0A0E" BorderBrush="{DynamicResource BorderBrushDark}" BorderThickness="0,1,0,0" Padding="12,10" Cursor="Hand" MouseLeftButtonUp="BorderSideUser_Click" ToolTip="Нажмите для переключения профиля">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#121218"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Width="34" Height="34" CornerRadius="6" Background="#14141A" BorderThickness="0" ClipToBounds="True">
+                                    <Image x:Name="ImgAvatar" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased"/>
+                                </Border>
+                                <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock x:Name="TxtSideName" Text="{Binding SideName}" FontWeight="SemiBold" FontSize="12" Foreground="White" TextTrimming="CharacterEllipsis"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                        <Ellipse Width="5" Height="5" Fill="#777788" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="TxtSideStatus" Text="{Binding SideStatus}" FontSize="10" Foreground="#777788" Margin="5,0,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <TextBlock Grid.Column="2" Text="⋮" FontSize="15" Foreground="#555566" VerticalAlignment="Center" Margin="4,0,2,0"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Custom Minimalist Monochrome Profiles Popup -->
+                        <Popup x:Name="PopupSavedAccounts" PlacementTarget="{Binding ElementName=BorderSideUser}" Placement="Top" StaysOpen="False" AllowsTransparency="True" VerticalOffset="-6">
+                            <Border Width="220" Background="#0C0C10" BorderBrush="#1C1C24" BorderThickness="1" CornerRadius="8" Padding="6">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="12" ShadowDepth="3" Opacity="0.7" Color="#000000"/>
+                                </Border.Effect>
+                                <StackPanel>
+                                    <TextBlock Text="ПРОФИЛИ" FontSize="9" FontWeight="Bold" Foreground="#444455" Margin="6,3,6,6"/>
+
+                                    <StackPanel x:Name="StackSidebarAccounts"/>
+
+                                    <Border Height="1" Background="#16161E" Margin="2,4,2,4"/>
+
+                                    <Button x:Name="BtnSidebarAddAccount" Background="Transparent" BorderThickness="0" Padding="0" Cursor="Hand" Click="BtnSidebarAddAccount_Click">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="Bd" Background="Transparent" CornerRadius="5" Padding="6,5">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="+" FontSize="13" FontWeight="Bold" Foreground="#AAAAAA" Width="18" TextAlignment="Center"/>
+                                                        <TextBlock Text="Добавить аккаунт..." FontSize="11" Foreground="#CCCCCC" Margin="4,0,0,0" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="Bd" Property="Background" Value="#15151D"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+
+                                    <Button x:Name="BtnSidebarLogout" Background="Transparent" BorderThickness="0" Padding="0" Cursor="Hand" Click="BtnSidebarLogout_Click">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="Bd" Background="Transparent" CornerRadius="5" Padding="6,5">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="✕" FontSize="11" FontWeight="Bold" Foreground="#777788" Width="18" TextAlignment="Center"/>
+                                                        <TextBlock Text="Выйти из аккаунта" FontSize="11" Foreground="#777788" Margin="4,0,0,0" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="Bd" Property="Background" Value="#181414"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</Border>
+</Window>
